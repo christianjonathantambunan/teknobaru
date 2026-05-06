@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu - MealQ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1 id="judul"></h1>
+    <div class="menu-container"></div>
+</div>
+
+<script>
+const container = document.querySelector(".menu-container");
+const kedai = localStorage.getItem("kedai");
+
+// kalau belum pilih kedai
+if(!kedai){
+    window.location.href = "home.html";
+}
+
+document.getElementById("judul").innerText = "Menu " + kedai;
+
+// data menu + gambar 
+const dataMenu = {
+    "Kedai Joni": [
+        { nama: "Nasi Goreng", harga: 12000, gambar: "assets/nasgor.jpg" },
+        { nama: "Ayam Geprek", harga: 12000, gambar: "assets/ayam.jpg" }
+    ],
+    "Kedai Kosim": [
+        { nama: "Mie Ayam", harga: 12000, gambar: "assets/mie.jpg" },
+        { nama: "Bakso", harga: 13000, gambar: "assets/bakso.jpg" }
+    ],
+    "Kedai Maranggi": [
+        { nama: "Sate Ayam", harga: 20000, gambar: "assets/sate.jpg" },
+        { nama: "Es Teh", harga: 5000, gambar: "assets/esteh.jpg" }
+    ],
+    "Kedai Japar": [
+        { nama: "Ketoprak", harga: 15000, gambar: "assets/ketoprak.jpg" },
+        { nama: "Gado gado", harga: 14000, gambar: "assets/gadogado.jpg" }
+    ],
+    "Kedai Joost": [
+        { nama: "Es Teler", harga: 10000, gambar: "assets/esteler.jpg" },
+        { nama: "Es Kelapa", harga: 10000, gambar: "assets/eskelapa.jpg" }
+    ]
+};
+
+// render menu
+dataMenu[kedai].forEach(item => {
+    container.innerHTML += `
+        <div class="menu-item">
+            <img src="${item.gambar}">
+            <h3>${item.nama}</h3>
+            <p>Rp ${item.harga}</p>
+            <button onclick="pesan('${item.nama}')">Pesan</button>
+        </div>
+    `;
+});
+
+function pesan(menu) {
+    localStorage.setItem("pesanan", menu);
+    window.location.href = "order.html";
+}
+</script>
+
+</body>
+</html>
