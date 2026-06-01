@@ -61,17 +61,19 @@ model MenuItem {
 }
 
 model Order {
-  id          String   @id @default(uuid())
-  studentId   String
-  student     User     @relation(fields: [studentId], references: [id])
-  tenantId    String
-  tenant      TenantProfile @relation(fields: [tenantId], references: [id])
-  status      String   @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
-  totalAmount Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  studentId     String
+  student       User     @relation(fields: [studentId], references: [id])
+  tenantId      String
+  tenant        TenantProfile @relation(fields: [tenantId], references: [id])
+  status        String   @default("PENDING") // PENDING, PREPARING, READY, COMPLETED, CANCELLED
+  paymentMethod String?
+  paymentStatus String   @default("UNPAID") // UNPAID, PAID, FAILED
+  totalAmount   Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  items       OrderItem[]
+  items         OrderItem[]
 }
 
 model OrderItem {

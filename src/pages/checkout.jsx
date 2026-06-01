@@ -1,8 +1,86 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconCart } from "../components/icons";
 
-export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQuantity, setCart, handleAddOrder }) {
+export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQuantity, setCart }) {
   const navigate = useNavigate();
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+
+  const handleCreateOrder = async () => {
+    if (cart.length === 0) return;
+    setIsCreatingOrder(true);
+    try {
+      // 1. Dapatkan studentId dummy
+      const loginRes = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'student@example.com', password: 'password123' })
+      });
+      const loginData = await loginRes.json();
+      
+      if (!loginData.user) throw new Error("Gagal login sebagai dummy student");
+      
+      // 2. Format items untuk API
+      const apiItems = cart.map(item => ({
+        menuItemId: item.id,
+        quantity: item.quantity,
+        priceAtTime: item.price
+      }));
+
+      // 3. Ambil tenantId dari item pertama
+      const tenantId = cart[0].tenantId;
+
+      // 4. Kirim pesanan ke backend untuk buat order & dapatkan snap_token
+      const orderRes = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: loginData.user.id,
+          tenantId: tenantId,
+          items: apiItems
+        })
+      });
+
+      const orderData = await orderRes.json();
+      if (!orderRes.ok) throw new Error(orderData.error || "Gagal membuat pesanan");
+
+      // 5. Trigger Midtrans Snap Popup
+      if (orderData.snapToken) {
+        if (orderData.snapToken === "dummy_token_replace_keys_in_env") {
+          alert("Server Key Midtrans Anda belum diatur di .env! Pembayaran gagal.");
+          return;
+        }
+
+        window.snap.pay(orderData.snapToken, {
+          onSuccess: function(result) {
+            // Payment success
+            setCart([]);
+            navigate(`/success?orderId=${orderData.id}`);
+          },
+          onPending: function(result) {
+            // Pending payment (e.g., waiting for VA transfer)
+            alert("Menunggu pembayaran Anda!");
+            setCart([]);
+            navigate(`/success?orderId=${orderData.id}`);
+          },
+          onError: function(result) {
+            alert("Pembayaran gagal!");
+          },
+          onClose: function() {
+            console.log("Popup ditutup tanpa menyelesaikan pembayaran");
+          }
+        });
+      } else {
+        throw new Error("Gagal mendapatkan token pembayaran dari server");
+      }
+      
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Terjadi kesalahan saat membuat pesanan: " + error.message);
+    } finally {
+      setIsCreatingOrder(false);
+    }
+  };
 
   return (
     <div
@@ -156,52 +234,10 @@ export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQu
               padding: "18px",
               fontSize: "18px",
             }}
-            onClick={async () => {
-              try {
-                // 1. Dapatkan studentId dummy dari Budi Santoso
-                const loginRes = await fetch('/api/auth/login', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: 'student@example.com', password: 'password123' })
-                });
-                const loginData = await loginRes.json();
-                
-                if (!loginData.user) throw new Error("Gagal login sebagai dummy student");
-                
-                // 2. Format items untuk API (menggunakan harga saat ini)
-                const apiItems = cart.map(item => ({
-                  menuItemId: item.id,
-                  quantity: item.quantity,
-                  priceAtTime: item.price
-                }));
-
-                // 3. Ambil tenantId dari item pertama di keranjang (asumsi semua dari tenant yang sama)
-                const tenantId = cart[0].tenantId;
-
-                // 4. Kirim pesanan
-                const orderRes = await fetch('/api/orders', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    studentId: loginData.user.id,
-                    tenantId: tenantId,
-                    items: apiItems
-                  })
-                });
-
-                const orderData = await orderRes.json();
-
-                if (!orderRes.ok) throw new Error(orderData.error || "Gagal membuat pesanan");
-
-                setCart([]);
-                navigate(`/success?orderId=${orderData.id}`);
-              } catch (error) {
-                console.error("Checkout error:", error);
-                alert("Terjadi kesalahan saat membuat pesanan: " + error.message);
-              }
-            }}
+            onClick={handleCreateOrder}
+            disabled={isCreatingOrder}
           >
-            Konfirmasi Pesanan
+            {isCreatingOrder ? "Memproses..." : "Lanjut Pembayaran Asli"}
           </button>
         </div>
       )}

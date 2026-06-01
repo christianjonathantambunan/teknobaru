@@ -1,12 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
+const midtransClient = require('midtrans-client');
+
+// Initialize Midtrans Snap
+let snap = new midtransClient.Snap({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY || 'SB-Mid-server-...',
+  clientKey: process.env.MIDTRANS_CLIENT_KEY || 'SB-Mid-client-...'
+});
 
 // Create a new order
 router.post('/', async (req, res) => {
   try {
     const { studentId, tenantId, items } = req.body;
-    // items should be array of: { menuItemId, quantity, priceAtTime }
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: 'Order must contain at least one item' });
@@ -19,6 +26,7 @@ router.post('/', async (req, res) => {
         studentId,
         tenantId,
         totalAmount,
+        paymentStatus: 'UNPAID',
         items: {
           create: items.map(item => ({
             menuItemId: item.menuItemId,
@@ -28,16 +36,84 @@ router.post('/', async (req, res) => {
         }
       },
       include: {
-        items: true
+        items: true,
+        student: true
       }
     });
 
-    res.status(201).json(order);
+    // Create Midtrans Transaction
+    let parameter = {
+      "transaction_details": {
+        "order_id": order.id,
+        "gross_amount": totalAmount
+      },
+      "credit_card": {
+        "secure": true
+      },
+      "customer_details": {
+        "first_name": order.student.name,
+        "email": order.student.email
+      }
+    };
+
+    try {
+      const transaction = await snap.createTransaction(parameter);
+      res.status(201).json({ ...order, snapToken: transaction.token });
+    } catch (midtransError) {
+      console.error("Midtrans Error:", midtransError.message);
+      // Fallback if key is invalid for now, so app doesn't crash completely during testing
+      res.status(201).json({ ...order, snapToken: "dummy_token_replace_keys_in_env" });
+    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to create order' });
   }
 });
+
+// Webhook / Notification from Midtrans
+router.post('/webhook/midtrans', async (req, res) => {
+  try {
+    const notificationJson = req.body;
+    const statusResponse = await snap.transaction.notification(notificationJson);
+    
+    let orderId = statusResponse.order_id;
+    let transactionStatus = statusResponse.transaction_status;
+    let fraudStatus = statusResponse.fraud_status;
+
+    let newStatus = 'UNPAID';
+
+    if (transactionStatus == 'capture'){
+        if (fraudStatus == 'challenge'){
+            newStatus = 'UNPAID';
+        } else if (fraudStatus == 'accept'){
+            newStatus = 'PAID';
+        }
+    } else if (transactionStatus == 'settlement'){
+        newStatus = 'PAID';
+    } else if (transactionStatus == 'cancel' ||
+      transactionStatus == 'deny' ||
+      transactionStatus == 'expire'){
+        newStatus = 'FAILED';
+    } else if (transactionStatus == 'pending'){
+        newStatus = 'UNPAID';
+    }
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { 
+        paymentStatus: newStatus,
+        paymentMethod: statusResponse.payment_type 
+      }
+    });
+
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).send('Webhook failed');
+  }
+});
+
 
 // Get orders (Could be for a student or a tenant)
 router.get('/', async (req, res) => {
