@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { AiRecommendation } from "../components/AiRecommendation";
 
 export function Home() {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ export function Home() {
 
   return (
     <div className="animate-slide-up" style={{ padding: "24px 0" }}>
+
+      {/* Hero heading */}
       <div style={{ marginBottom: "40px", textAlign: "center" }}>
         <h2 style={{ marginBottom: "12px", fontSize: "36px", fontWeight: 800 }}>
           Mau makan apa hari ini? 🍔
@@ -32,6 +35,13 @@ export function Home() {
         </p>
       </div>
 
+      {/* AI Recommendation Section */}
+      <AiRecommendation />
+
+      {/* Tenant grid */}
+      <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "24px" }}>
+        Semua Tenant 🏪
+      </h3>
       <div className="grid-cards">
         {tenants.map((t) => (
           <div
