@@ -50,10 +50,10 @@ export function Home() {
                   objectFit: "cover",
                 }}
               />
-              <div 
-                style={{ 
-                  position: "absolute", 
-                  top: "16px", 
+              <div
+                style={{
+                  position: "absolute",
+                  top: "16px",
                   right: "16px",
                   backgroundColor: "rgba(255, 255, 255, 0.9)",
                   padding: "4px 12px",
@@ -68,7 +68,7 @@ export function Home() {
                 ⭐ {t.rating}
               </div>
             </div>
-            
+
             <div style={{ padding: "24px" }}>
               <div
                 style={{
