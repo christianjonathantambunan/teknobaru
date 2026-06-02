@@ -41,9 +41,14 @@ export function Navbar({ role, cartCount, cartTotal, onLogout }) {
 
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           {role === "user" && (
-            <Link to="/checkout" className="btn btn-outline" style={{ textDecoration: "none", backgroundColor: "var(--surface)" }}>
-              <IconCart /> {cartCount} | Rp {cartTotal.toLocaleString("id-ID")}
-            </Link>
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <Link to="/my-orders" style={{ textDecoration: "none", color: "var(--text-main)", fontWeight: 600 }}>
+                Pesanan Saya
+              </Link>
+              <Link to="/checkout" className="btn btn-outline" style={{ textDecoration: "none", backgroundColor: "var(--surface)" }}>
+                <IconCart /> {cartCount} | Rp {cartTotal.toLocaleString("id-ID")}
+              </Link>
+            </div>
           )}
           <button
             className="btn btn-ghost"

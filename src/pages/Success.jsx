@@ -67,7 +67,7 @@ export function Success() {
             Pesanan Berhasil! 🎉
           </h2>
           <p className="text-muted" style={{ fontSize: "16px", marginBottom: "32px", lineHeight: 1.6 }}>
-            Terima kasih telah memesan. Silakan tunjukkan nomor pesanan ini ke kasir kantin untuk mengambil makanan Anda.
+            Terima kasih telah memesan. Silakan pantau status pesanan Anda.
           </p>
 
           <div
@@ -80,10 +80,10 @@ export function Success() {
             }}
           >
             <p style={{ fontSize: "14px", color: "var(--text-muted)", marginBottom: "4px" }}>
-              Nomor Pesanan Anda
+              ID Pesanan Anda
             </p>
-            <p style={{ fontSize: "36px", fontWeight: 800, color: "var(--primary)", letterSpacing: "2px" }}>
-              #{orderId}
+            <p style={{ fontSize: "36px", fontWeight: 800, color: "var(--primary)", letterSpacing: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              #{orderId.split('-')[0]}
             </p>
           </div>
 
@@ -91,7 +91,7 @@ export function Success() {
             <button
               className="btn btn-outline"
               style={{ flex: 1, padding: "16px" }}
-              onClick={() => navigate("/dashboard")} // Seolah-olah user bisa cek dashboard riwayatnya
+              onClick={() => navigate("/my-orders")}
             >
               Lihat Pesanan
             </button>

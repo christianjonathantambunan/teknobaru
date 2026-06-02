@@ -10,6 +10,7 @@ import { TenantMenu } from "./pages/TenantMenu";
 import { Checkout } from "./pages/Checkout";
 import { Dashboard } from "./pages/Dashboard";
 import { Success } from "./pages/Success";
+import { MyOrders } from "./pages/MyOrders";
 
 function App() {
   const [role, setRole] = useState("user"); // user, tenant
@@ -103,6 +104,7 @@ function App() {
               <Dashboard />
             } 
           />
+          <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/success" element={<Success />} />
         </Routes>
       </main>
