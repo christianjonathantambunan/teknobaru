@@ -76,34 +76,34 @@ router.post('/webhook/midtrans', async (req, res) => {
   try {
     const notificationJson = req.body;
     const statusResponse = await snap.transaction.notification(notificationJson);
-    
+
     let orderId = statusResponse.order_id;
     let transactionStatus = statusResponse.transaction_status;
     let fraudStatus = statusResponse.fraud_status;
 
     let newStatus = 'UNPAID';
 
-    if (transactionStatus == 'capture'){
-        if (fraudStatus == 'challenge'){
-            newStatus = 'UNPAID';
-        } else if (fraudStatus == 'accept'){
-            newStatus = 'PAID';
-        }
-    } else if (transactionStatus == 'settlement'){
+    if (transactionStatus == 'capture') {
+      if (fraudStatus == 'challenge') {
+        newStatus = 'UNPAID';
+      } else if (fraudStatus == 'accept') {
         newStatus = 'PAID';
+      }
+    } else if (transactionStatus == 'settlement') {
+      newStatus = 'PAID';
     } else if (transactionStatus == 'cancel' ||
       transactionStatus == 'deny' ||
-      transactionStatus == 'expire'){
-        newStatus = 'FAILED';
-    } else if (transactionStatus == 'pending'){
-        newStatus = 'UNPAID';
+      transactionStatus == 'expire') {
+      newStatus = 'FAILED';
+    } else if (transactionStatus == 'pending') {
+      newStatus = 'UNPAID';
     }
 
     await prisma.order.update({
       where: { id: orderId },
-      data: { 
+      data: {
         paymentStatus: newStatus,
-        paymentMethod: statusResponse.payment_type 
+        paymentMethod: statusResponse.payment_type
       }
     });
 
@@ -119,7 +119,7 @@ router.post('/webhook/midtrans', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const { studentId, tenantId } = req.query;
-    
+
     let whereClause = {};
     if (studentId) whereClause.studentId = studentId;
     if (tenantId) whereClause.tenantId = tenantId;
@@ -149,7 +149,7 @@ router.get('/', async (req, res) => {
 router.put('/:id/status', async (req, res) => {
   try {
     const { status } = req.body; // PENDING, PREPARING, READY, COMPLETED, CANCELLED
-    
+
     const order = await prisma.order.update({
       where: { id: req.params.id },
       data: { status }

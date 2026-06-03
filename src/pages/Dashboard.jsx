@@ -49,9 +49,9 @@ export function Dashboard() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "PENDING": return { bg: "rgba(239, 68, 68, 0.1)", color: "var(--danger)" }; 
-      case "PREPARING": return { bg: "rgba(252, 163, 17, 0.1)", color: "var(--secondary)" }; 
-      case "COMPLETED": return { bg: "rgba(16, 185, 129, 0.1)", color: "var(--success)" }; 
+      case "PENDING": return { bg: "rgba(239, 68, 68, 0.1)", color: "var(--danger)" };
+      case "PREPARING": return { bg: "rgba(252, 163, 17, 0.1)", color: "var(--secondary)" };
+      case "COMPLETED": return { bg: "rgba(16, 185, 129, 0.1)", color: "var(--success)" };
       default: return { bg: "rgba(100, 116, 139, 0.1)", color: "var(--text-muted)" };
     }
   };
@@ -68,9 +68,9 @@ export function Dashboard() {
           marginBottom: "40px",
         }}
       >
-        <div style={{ 
-          background: "var(--primary-light)", 
-          padding: "16px", 
+        <div style={{
+          background: "var(--primary-light)",
+          padding: "16px",
           borderRadius: "16px",
           color: "var(--primary)"
         }}>
@@ -163,7 +163,7 @@ export function Dashboard() {
 
       <div style={{ marginTop: "48px" }}>
         <h3 style={{ marginBottom: "24px", fontSize: "24px", fontWeight: 700 }}>Daftar Pesanan</h3>
-        
+
         {orders.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px", background: "var(--surface)", borderRadius: "var(--radius-lg)" }}>
             <p className="text-muted">Belum ada pesanan masuk.</p>
@@ -203,7 +203,7 @@ export function Dashboard() {
                         {translateStatus(order.status)}
                       </span>
                     </div>
-                    
+
                     <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                       {order.items.map((item, idx) => (
                         <li key={idx} className="text-muted" style={{ marginBottom: "4px" }}>
@@ -216,8 +216,8 @@ export function Dashboard() {
 
                   <div style={{ display: "flex", gap: "8px" }}>
                     {order.status === "PENDING" && (
-                      <button 
-                        className="btn btn-outline" 
+                      <button
+                        className="btn btn-outline"
                         style={{ borderColor: "var(--secondary)", color: "var(--secondary)", padding: "10px 20px" }}
                         onClick={() => handleUpdateOrderStatus(order.id, "PREPARING")}
                       >
@@ -225,8 +225,8 @@ export function Dashboard() {
                       </button>
                     )}
                     {order.status === "PREPARING" && (
-                      <button 
-                        className="btn btn-primary" 
+                      <button
+                        className="btn btn-primary"
                         style={{ background: "var(--success)", padding: "10px 20px" }}
                         onClick={() => handleUpdateOrderStatus(order.id, "COMPLETED")}
                       >
