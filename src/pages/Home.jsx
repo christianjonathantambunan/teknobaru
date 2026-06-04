@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiRecommendation } from "../components/AiRecommendation";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function Home() {
   const navigate = useNavigate();
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/tenants')
+    fetch(`${API_URL}/api/tenants`)
       .then(res => res.json())
       .then(data => {
         setTenants(data);

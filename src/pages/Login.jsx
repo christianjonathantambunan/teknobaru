@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function Login({ setRole }) {
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
@@ -17,7 +19,7 @@ export function Login({ setRole }) {
     setError("");
     setLoading(true);
 
-    const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
+    const endpoint = isRegister ? `${API_URL}/api/auth/register` : `${API_URL}/api/auth/login`;
     const payload = {
       email,
       password,

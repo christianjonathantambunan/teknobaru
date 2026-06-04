@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 const MOODS = [
   { value: "lapar_berat", label: "😤 Lapar banget" },
   { value: "santai", label: "😌 Santai aja" },
@@ -144,7 +146,7 @@ export function AiRecommendation() {
     const message = `Mood saya: ${moodLabel}. Selera: ${seleraLabel}. Kategori yang diinginkan: ${kategoriLabel}. Budget saya: ${budgetLabel}. Tolong rekomendasikan menu yang paling cocok!`;
 
     try {
-      const res = await fetch("/api/ai/recommend", {
+      const res = await fetch(`${API_URL}/api/ai/recommend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, conversationHistory: [] }),

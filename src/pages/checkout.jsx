@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconArrowLeft, IconCart } from "../components/icons";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQuantity, setCart }) {
   const navigate = useNavigate();
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
@@ -11,7 +13,7 @@ export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQu
     setIsCreatingOrder(true);
     try {
       // 1. Dapatkan studentId dummy
-      const loginRes = await fetch('/api/auth/login', {
+      const loginRes = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'student@example.com', password: 'password123' })
@@ -31,7 +33,7 @@ export function Checkout({ cart, cartTotal, handleRemoveFromCart, handleUpdateQu
       const tenantId = cart[0].tenantId;
 
       // 4. Kirim pesanan ke backend untuk buat order & dapatkan snap_token
-      const orderRes = await fetch('/api/orders', {
+      const orderRes = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

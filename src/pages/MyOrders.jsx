@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +12,7 @@ export function MyOrders() {
     const fetchMyOrders = async () => {
       try {
         // Dummy login untuk mendapatkan studentId (sesuai alur saat ini)
-        const loginRes = await fetch('/api/auth/login', {
+        const loginRes = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: 'student@example.com', password: 'password123' })
@@ -22,7 +24,7 @@ export function MyOrders() {
         const studentId = loginData.user.id;
         
         // Fetch orders based on studentId
-        const ordersRes = await fetch(`/api/orders?studentId=${studentId}`);
+        const ordersRes = await fetch(`${API_URL}/api/orders?studentId=${studentId}`);
         const ordersData = await ordersRes.json();
         
         if (ordersRes.ok) {

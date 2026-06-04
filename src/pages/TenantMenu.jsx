@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { IconArrowLeft } from "../components/icons";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function TenantMenu({ handleAddToCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,11 +13,11 @@ export function TenantMenu({ handleAddToCart }) {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/tenants/${id}`).then(res => {
+      fetch(`${API_URL}/api/tenants/${id}`).then(res => {
         if (!res.ok) throw new Error("Tenant not found");
         return res.json();
       }),
-      fetch(`/api/tenants/${id}/menu`).then(res => res.json())
+      fetch(`${API_URL}/api/tenants/${id}/menu`).then(res => res.json())
     ])
     .then(([tenantData, menuData]) => {
       setActiveTenant(tenantData);

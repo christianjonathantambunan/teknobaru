@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { IconStore } from "../components/icons";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = () => {
-    fetch('/api/orders')
+    fetch(`${API_URL}/api/orders`)
       .then(res => res.json())
       .then(data => {
         setOrders(data);
@@ -24,7 +26,7 @@ export function Dashboard() {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      await fetch(`/api/orders/${orderId}/status`, {
+      await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
